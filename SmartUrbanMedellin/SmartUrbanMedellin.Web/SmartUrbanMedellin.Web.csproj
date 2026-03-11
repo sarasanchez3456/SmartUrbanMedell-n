@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../SmartUrbanMedellin.BLL/SmartUrbanMedellin.BLL.csproj" />
+    <ProjectReference Include="../SmartUrbanMedellin.ENT/SmartUrbanMedellin.ENT.csproj" />
+    <ProjectReference Include="../SmartUrbanMedellin.UTIL/SmartUrbanMedellin.UTIL.csproj" />
+  </ItemGroup>
+</Project>

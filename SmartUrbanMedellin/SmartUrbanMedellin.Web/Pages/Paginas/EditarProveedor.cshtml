@@ -1,0 +1,78 @@
+@page
+@model SmartUrbanMedellin.Web.Pages.Paginas.EditarProveedorModel
+@{
+    ViewData["Title"] = "Editar Proveedor";
+}
+
+<div class="flex items-center gap-3 mb-6">
+    <a href="/Paginas/Proveedores" class="text-blue-600 hover:underline text-sm">← Proveedores</a>
+    <span class="text-slate-300">/</span>
+    <h2 class="text-2xl font-bold text-slate-700">Editar Proveedor</h2>
+</div>
+
+<div class="grid lg:grid-cols-5 gap-6">
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow p-6">
+            <h3 class="font-semibold text-slate-700 mb-4 pb-2 border-b">Actualizar Datos</h3>
+            <form method="post" class="space-y-4">
+                <input type="hidden" asp-for="Proveedor.IdProveedor" />
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Razón Social</label>
+                    <input type="text" asp-for="Proveedor.RazonSocial"
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Contacto</label>
+                    <input type="text" asp-for="Proveedor.Contacto"
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Teléfono</label>
+                    <input type="tel" asp-for="Proveedor.Telefono"
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Correo</label>
+                    <input type="email" asp-for="Proveedor.Correo"
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                </div>
+                <div class="pt-2 border-t">
+                    <label class="block text-sm font-medium text-slate-600 mb-2">📍 Actualizar Ubicación</label>
+                    <input type="hidden" id="inputLat" name="Lat" value="@Model.Lat" />
+                    <input type="hidden" id="inputLng" name="Lng" value="@Model.Lng" />
+                    <div id="coordsDisplay" class="bg-slate-100 rounded-lg px-4 py-2.5 text-xs font-mono text-slate-500">
+                        Lat: @Model.Lat | Lng: @Model.Lng
+                    </div>
+                </div>
+                <button type="submit"
+                        class="w-full bg-yellow-400 text-yellow-900 py-3 rounded-xl font-semibold hover:bg-yellow-300 transition shadow">
+                    Actualizar Proveedor
+                </button>
+                <a href="/Paginas/Proveedores"
+                   class="block text-center text-slate-500 text-sm hover:text-slate-700 mt-1">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="lg:col-span-3">
+        <div class="bg-white rounded-2xl shadow overflow-hidden">
+            <div class="px-6 py-4 bg-yellow-500 text-white font-semibold">🗺️ Ubicación Actual — Clic para mover</div>
+            <div class="mapa-box mapa-tall" id="mapa-editar"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const lat = parseFloat('@Model.Lat') || 6.2442;
+          const lng = parseFloat('@Model.Lng') || -75.5812;
+          const m = crearMapa('mapa-editar', lat, lng, 15);
+          if (!m) return;
+          m.on('load', () => {
+            agregarPin(m, lng, lat, '📍 Ubicación actual', '#d97706');
+            activarSeleccion(m, 'inputLat', 'inputLng', 'coordsDisplay');
+          });
+        });
+    </script>
+}

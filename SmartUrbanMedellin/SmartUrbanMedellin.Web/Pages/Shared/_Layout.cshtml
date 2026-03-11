@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - SmartUrban Medellín</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                brand: { DEFAULT:'#1d4ed8', light:'#3b82f6', dark:'#1e3a8a' }
+              }
+            }
+          }
+        }
+    </script>
+
+    <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.1/maptiler-sdk.css" rel="stylesheet" />
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.1/maptiler-sdk.umd.min.js"></script>
+
+    <style>
+        .mapa-box { width:100%; height:420px; border-radius:0.75rem; overflow:hidden; }
+        .mapa-tall { height:520px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <nav class="bg-blue-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="font-bold text-xl flex items-center gap-2">
+                📍 SmartUrban Medellín
+            </a>
+            <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+                <a href="/Paginas/Menu" class="hover:text-yellow-300 transition">Menú</a>
+                <a href="/Paginas/Proveedores" class="hover:text-yellow-300 transition">Proveedores</a>
+                <a href="/Paginas/Servicios" class="hover:text-yellow-300 transition">Servicios</a>
+                <a href="/Paginas/Solicitudes" class="hover:text-yellow-300 transition">Solicitudes</a>
+                <a href="/Paginas/RegistrarProveedor"
+                   class="bg-yellow-400 text-blue-900 px-4 py-1.5 rounded-full font-semibold hover:bg-yellow-300 transition">
+                    + Proveedor
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
+        @RenderBody()
+    </main>
+
+    <footer class="bg-slate-800 text-slate-400 text-center text-sm py-4 mt-auto">
+        © 2025 SmartUrban Medellín · Conectando ciudadanos con servicios urbanos
+    </footer>
+
+    <script>
+        const MAPTILER_KEY = 'ZbBJ9WDp7YPDmMKxooBj';
+        if (typeof maptilersdk !== 'undefined') {
+          maptilersdk.config.apiKey = MAPTILER_KEY;
+        }
+
+        function crearMapa(id, lat=6.2442, lng=-75.5812, zoom=12) {
+          if (typeof maptilersdk === 'undefined') return null;
+          return new maptilersdk.Map({
+            container: id,
+            style: maptilersdk.MapStyle.STREETS,
+            center: [lng, lat],
+            zoom: zoom
+          });
+        }
+
+        function agregarPin(mapa, lng, lat, titulo, color='#1d4ed8') {
+          const el = document.createElement('div');
+          el.style.cssText = `width:28px;height:28px;border-radius:50% 50% 50% 0;
+            background:${color};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);
+            transform:rotate(-45deg);cursor:pointer;`;
+          new maptilersdk.Marker({ element: el })
+            .setLngLat([lng, lat])
+            .setPopup(new maptilersdk.Popup({ offset:25 }).setHTML(
+              `<div style="font-weight:600;font-size:13px">${titulo}</div>`
+            ))
+            .addTo(mapa);
+        }
+
+        function activarSeleccion(mapa, idLat, idLng, idDisplay) {
+          let marker = null;
+          mapa.on('click', e => {
+            const lat = e.lngLat.lat.toFixed(6);
+            const lng = e.lngLat.lng.toFixed(6);
+            document.getElementById(idLat).value = lat;
+            document.getElementById(idLng).value = lng;
+            if (idDisplay)
+              document.getElementById(idDisplay).textContent = `📍 Lat: ${lat}  |  Lng: ${lng}`;
+            if (marker) marker.remove();
+            const el = document.createElement('div');
+            el.style.cssText = `width:20px;height:20px;border-radius:50%;
+              background:#059669;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);`;
+            marker = new maptilersdk.Marker({ element: el })
+              .setLngLat([parseFloat(lng), parseFloat(lat)])
+              .addTo(mapa);
+          });
+        }
+    </script>
+
+    <script src="/JS/scripts.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

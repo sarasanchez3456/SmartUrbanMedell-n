@@ -1,0 +1,82 @@
+@page
+@model SmartUrbanMedellin.Web.Pages.Paginas.ServiciosModel
+@{
+    ViewData["Title"] = "Servicios";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-slate-700">🛠️ Servicios Disponibles</h2>
+</div>
+
+<div class="bg-white rounded-xl shadow p-4 mb-6">
+    <p class="text-sm font-semibold text-slate-600 mb-3">🔍 Buscar servicios por zona de Medellín:</p>
+    <div class="flex gap-3 flex-wrap">
+        <input id="zonaInput" type="text"
+               placeholder="Ej: El Poblado, Laureles, Bello, Itagüí..."
+               class="flex-1 min-w-48 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <button onclick="buscarZona()"
+                class="bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-600 transition">
+            Ver en Mapa
+        </button>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow overflow-hidden mb-6">
+    <div class="px-6 py-4 bg-blue-700 text-white font-semibold">
+        🗺️ Servicios por Zona — Medellín y Área Metropolitana
+    </div>
+    <div class="mapa-box" id="mapa-servicios"></div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    @foreach (var s in Model.Servicios)
+    {
+        <div class="bg-white rounded-2xl shadow hover:shadow-md transition hover:-translate-y-0.5 overflow-hidden">
+            <div class="@s.ColorBg px-5 py-4 flex items-center gap-3">
+                <span class="text-3xl">@s.Emoji</span>
+                <div>
+                    <h3 class="font-bold text-white">@s.Nombre</h3>
+                    <span class="text-xs text-white/80">@s.Categoria</span>
+                </div>
+            </div>
+            <div class="p-4">
+                <p class="text-slate-500 text-sm mb-4">@s.Descripcion</p>
+                <a href="/Paginas/SolicitarServicio?idServicio=@s.IdServicio"
+                   class="block text-center bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition">
+                    Solicitar →
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        let mapaS;
+        document.addEventListener('DOMContentLoaded', () => {
+          mapaS = crearMapa('mapa-servicios', 6.2442, -75.5812, 11);
+          if (!mapaS) return;
+          mapaS.on('load', () => {
+            agregarPin(mapaS, -75.5681, 6.2090, '⚡ Electricidad - El Poblado', '#1d4ed8');
+            agregarPin(mapaS, -75.5950, 6.2442, '🔧 Plomería - Laureles',       '#059669');
+            agregarPin(mapaS, -75.5500, 6.2650, '🌿 Jardinería - Poblado',      '#16a34a');
+            agregarPin(mapaS, -75.6050, 6.2220, '🪚 Carpintería - Belén',       '#d97706');
+            agregarPin(mapaS, -75.5812, 6.3100, '🎨 Pintura - Bello',           '#dc2626');
+            agregarPin(mapaS, -75.5900, 6.1750, '🧹 Limpieza - Envigado',       '#7c3aed');
+          });
+        });
+
+        function buscarZona() {
+          const texto = document.getElementById('zonaInput').value.trim();
+          if (!mapaS || !texto) return;
+          const url = `https://api.maptiler.com/geocoding/${encodeURIComponent(texto + ', Medellín, Colombia')}.json?key=${MAPTILER_KEY}&limit=1`;
+          fetch(url).then(r => r.json()).then(data => {
+            if (data.features?.length > 0) {
+              const [lng, lat] = data.features[0].center;
+              mapaS.flyTo({ center: [lng, lat], zoom: 14, duration: 1000 });
+              agregarPin(mapaS, lng, lat, '🔍 ' + texto, '#1d4ed8');
+            }
+          });
+        }
+    </script>
+}

@@ -1,0 +1,58 @@
+@page
+@model SmartUrbanMedellin.Web.Pages.Paginas.DefaultModel
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-500 text-white px-8 py-10 mb-8 shadow-lg">
+    <h1 class="text-3xl font-bold mb-2">Bienvenido a SmartUrban Medellín</h1>
+    <p class="text-blue-100 text-lg max-w-2xl">
+        Conectamos ciudadanos con trabajadores independientes de plomería, electricidad,
+        carpintería, limpieza y más. Rápido, seguro y cerca de ti.
+    </p>
+    <div class="mt-6 flex gap-3 flex-wrap">
+        <a href="/Paginas/Servicios"
+           class="bg-yellow-400 text-blue-900 font-semibold px-6 py-2 rounded-full hover:bg-yellow-300 transition shadow">
+            Ver Servicios
+        </a>
+        <a href="/Paginas/RegistrarProveedor"
+           class="bg-white/20 border border-white text-white px-6 py-2 rounded-full hover:bg-white/30 transition">
+            Ofrecer un Servicio
+        </a>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    @foreach (var stat in Model.Stats)
+    {
+        <div class="bg-white rounded-xl shadow p-5 flex flex-col items-center text-center hover:shadow-md transition cursor-pointer"
+             onclick="window.location='@stat.Url'">
+            <span class="text-4xl mb-2">@stat.Emoji</span>
+            <span class="text-2xl font-bold text-blue-700">@stat.Valor</span>
+            <span class="text-slate-500 text-sm mt-1">@stat.Etiqueta</span>
+        </div>
+    }
+</div>
+
+<div class="bg-white rounded-2xl shadow overflow-hidden">
+    <div class="px-6 py-4 border-b flex items-center gap-2">
+        <span class="text-blue-700 font-semibold text-lg">🗺️ Servicios disponibles en Medellín</span>
+    </div>
+    <div class="mapa-box" id="mapa-inicio"></div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const m = crearMapa('mapa-inicio', 6.2442, -75.5812, 12);
+          if (!m) return;
+          m.on('load', () => {
+            agregarPin(m, -75.5681, 6.2530, '⚡ El Poblado - Electricidad', '#1d4ed8');
+            agregarPin(m, -75.5900, 6.2700, '🔧 Laureles - Plomería',       '#059669');
+            agregarPin(m, -75.5750, 6.2100, '🏠 Envigado - Limpieza',       '#7c3aed');
+            agregarPin(m, -75.5812, 6.2442, '🪚 Centro - Carpintería',      '#d97706');
+            agregarPin(m, -75.6050, 6.2600, '🎨 Belén - Pintura',           '#dc2626');
+          });
+        });
+    </script>
+}

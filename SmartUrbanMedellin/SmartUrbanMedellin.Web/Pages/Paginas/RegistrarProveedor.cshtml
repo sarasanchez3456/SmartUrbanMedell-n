@@ -1,0 +1,83 @@
+@page
+@model SmartUrbanMedellin.Web.Pages.Paginas.RegistrarProveedorModel
+@{
+    ViewData["Title"] = "Registrar Proveedor";
+}
+
+<div class="flex items-center gap-3 mb-6">
+    <a href="/Paginas/Proveedores" class="text-blue-600 hover:underline text-sm">← Proveedores</a>
+    <span class="text-slate-300">/</span>
+    <h2 class="text-2xl font-bold text-slate-700">Registrar Proveedor</h2>
+</div>
+
+<div class="grid lg:grid-cols-5 gap-6">
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow p-6">
+            <h3 class="font-semibold text-slate-700 mb-4 pb-2 border-b">Datos del Proveedor</h3>
+            <form method="post" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Razón Social *</label>
+                    <input type="text" asp-for="Proveedor.RazonSocial" required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                           placeholder="Ej: Eléctricos del Norte" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Contacto *</label>
+                    <input type="text" asp-for="Proveedor.Contacto" required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                           placeholder="Nombre del responsable" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Teléfono *</label>
+                    <input type="tel" asp-for="Proveedor.Telefono" required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                           placeholder="3001234567" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Correo *</label>
+                    <input type="email" asp-for="Proveedor.Correo" required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                           placeholder="correo@empresa.com" />
+                </div>
+                <div class="pt-2 border-t">
+                    <label class="block text-sm font-medium text-slate-600 mb-2">
+                        📍 Ubicación * <span class="text-xs text-slate-400 font-normal">(haz clic en el mapa)</span>
+                    </label>
+                    <input type="hidden" id="inputLat" name="Lat" />
+                    <input type="hidden" id="inputLng" name="Lng" />
+                    <div id="coordsDisplay" class="bg-slate-100 rounded-lg px-4 py-2.5 text-xs font-mono text-slate-500">
+                        Sin ubicación seleccionada
+                    </div>
+                </div>
+                <button type="submit"
+                        class="w-full bg-blue-700 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition shadow">
+                    Guardar Proveedor
+                </button>
+                <a href="/Paginas/Proveedores"
+                   class="block text-center text-slate-500 text-sm hover:text-slate-700 mt-1">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="lg:col-span-3">
+        <div class="bg-white rounded-2xl shadow overflow-hidden">
+            <div class="px-6 py-4 bg-green-700 text-white font-semibold">
+                🗺️ Seleccionar Ubicación en Medellín
+            </div>
+            <div class="mapa-box mapa-tall" id="mapa-registro"></div>
+        </div>
+        <p class="text-xs text-slate-400 mt-2 px-1">
+            💡 Haz clic en el mapa para marcar la dirección exacta del proveedor.
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const m = crearMapa('mapa-registro', 6.2442, -75.5812, 13);
+          if (!m) return;
+          m.on('load', () => activarSeleccion(m, 'inputLat', 'inputLng', 'coordsDisplay'));
+        });
+    </script>
+}

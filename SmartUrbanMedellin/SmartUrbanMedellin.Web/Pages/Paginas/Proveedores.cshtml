@@ -1,0 +1,105 @@
+@page
+@model SmartUrbanMedellin.Web.Pages.Paginas.ProveedoresModel
+@{
+    ViewData["Title"] = "Proveedores";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-slate-700">🏪 Proveedores</h2>
+    <a href="/Paginas/RegistrarProveedor"
+       class="bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-blue-600 transition shadow">
+        + Nuevo Proveedor
+    </a>
+</div>
+
+<div class="bg-white rounded-xl shadow p-4 mb-6 flex gap-3 items-center">
+    <span class="text-slate-500 text-sm font-medium">🔍 Buscar por barrio:</span>
+    <input id="busquedaBarrio" type="text"
+           placeholder="Ej: El Poblado, Laureles, Envigado..."
+           class="flex-1 border border-slate-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+           oninput="buscarEnMapa(this.value)" />
+    <button onclick="buscarEnMapa(document.getElementById('busquedaBarrio').value)"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-500 transition">
+        Buscar
+    </button>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-2xl shadow overflow-hidden">
+        <div class="px-6 py-4 bg-blue-700 text-white font-semibold">Lista de Proveedores</div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-100 text-slate-600 uppercase text-xs">
+                    <tr>
+                        <th class="px-4 py-3 text-left">Razón Social</th>
+                        <th class="px-4 py-3 text-left">Contacto</th>
+                        <th class="px-4 py-3 text-left">Teléfono</th>
+                        <th class="px-4 py-3 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var p in Model.Proveedores)
+                    {
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-4 py-3 font-medium">@p.RazonSocial</td>
+                            <td class="px-4 py-3 text-slate-500">@p.Contacto</td>
+                            <td class="px-4 py-3 text-slate-500">@p.Telefono</td>
+                            <td class="px-4 py-3 text-center">
+                                <a href="/Paginas/EditarProveedor?id=@p.IdProveedor"
+                                   class="inline-block bg-yellow-400 text-yellow-900 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-yellow-300 mr-1">
+                                    ✏️ Editar
+                                </a>
+                                <button onclick="confirmarEliminar('@p.RazonSocial')"
+                                        class="bg-red-100 text-red-700 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-red-200">
+                                    🗑️
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Proveedores.Any())
+                    {
+                        <tr><td colspan="4" class="text-center text-slate-400 py-8">No hay proveedores registrados aún</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow overflow-hidden">
+        <div class="px-6 py-4 bg-green-700 text-white font-semibold">📍 Ubicación de Proveedores</div>
+        <div class="mapa-box" id="mapa-proveedores"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const provGeo = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProveedoresGeo));
+        let mapaP;
+
+        document.addEventListener('DOMContentLoaded', () => {
+          mapaP = crearMapa('mapa-proveedores', 6.2442, -75.5812, 12);
+          if (!mapaP) return;
+          mapaP.on('load', () => {
+            provGeo.forEach(p => {
+              if (p.lat && p.lng) agregarPin(mapaP, p.lng, p.lat, p.razonSocial, '#059669');
+            });
+          });
+        });
+
+        function buscarEnMapa(texto) {
+          if (!mapaP || !texto.trim()) return;
+          const url = `https://api.maptiler.com/geocoding/${encodeURIComponent(texto + ', Medellín, Colombia')}.json?key=${MAPTILER_KEY}&limit=1`;
+          fetch(url).then(r => r.json()).then(data => {
+            if (data.features?.length > 0) {
+              const [lng, lat] = data.features[0].center;
+              mapaP.flyTo({ center: [lng, lat], zoom: 14, duration: 1200 });
+              agregarPin(mapaP, lng, lat, '🔍 ' + texto, '#1d4ed8');
+            }
+          });
+        }
+
+        function confirmarEliminar(nombre) {
+          if (confirm(`¿Eliminar a ${nombre}?`)) { /* TODO: llamar endpoint */ }
+        }
+    </script>
+}

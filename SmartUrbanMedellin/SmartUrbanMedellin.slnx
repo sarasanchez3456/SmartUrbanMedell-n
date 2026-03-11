@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="SmartUrbanMedellin.Web/SmartUrbanMedellin.Web.csproj" />
+  <Project Path="SmartUrbanMedellin.ENT/SmartUrbanMedellin.ENT.csproj" />
+  <Project Path="SmartUrbanMedellin.DAL/SmartUrbanMedellin.DAL.csproj" />
+  <Project Path="SmartUrbanMedellin.BLL/SmartUrbanMedellin.BLL.csproj" />
+  <Project Path="SmartUrbanMedellin.UTIL/SmartUrbanMedellin.UTIL.csproj" />
+</Solution>
