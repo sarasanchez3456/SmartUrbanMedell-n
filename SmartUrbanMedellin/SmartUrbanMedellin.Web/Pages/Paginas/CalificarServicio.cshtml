@@ -4,45 +4,57 @@
     ViewData["Title"] = "Calificar Servicio";
 }
 
-<div class="flex items-center gap-3 mb-6">
-    <a href="/Paginas/Solicitudes" class="text-blue-600 hover:underline text-sm">← Solicitudes</a>
+<div class="animate-up mb-6 flex items-center gap-2 text-sm">
+    <a href="/Paginas/Solicitudes" class="text-azul hover:underline">← Solicitudes</a>
     <span class="text-slate-300">/</span>
-    <h2 class="text-2xl font-bold text-slate-700">⭐ Calificar Servicio</h2>
+    <span class="text-slate-400">Calificar Servicio</span>
 </div>
 
-<div class="max-w-lg mx-auto">
-    <div class="bg-white rounded-2xl shadow p-8">
-        <div class="text-center mb-6">
-            <span class="text-5xl">⭐</span>
-            <p class="text-slate-500 text-sm mt-2">Tu opinión ayuda a otros ciudadanos a elegir mejor</p>
+<div class="max-w-md mx-auto animate-up delay-1">
+    <div class="card p-8">
+        @* Header *@
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-2xl bg-oro/10 flex items-center justify-center text-4xl mx-auto mb-3">⭐</div>
+            <h2 class="font-display font-black text-2xl text-carbon mb-1">Calificar Servicio</h2>
+            <p class="text-slate-400 text-sm">Tu opinión ayuda a otros ciudadanos a elegir mejor</p>
         </div>
+
         <form method="post" class="space-y-6">
             <input type="hidden" asp-for="Calificacion.IdSolicitud" />
+
+            @* Star rating *@
             <div>
-                <label class="block text-sm font-medium text-slate-600 mb-3 text-center">¿Cómo calificarías el servicio?</label>
-                <div class="flex justify-center gap-4">
-                    @for (int i = 1; i <= 5; i++)
+                <label class="field-label text-center block mb-4">¿Cómo calificarías el servicio?</label>
+                <div class="star-group">
+                    @for (int i = 5; i >= 1; i--)
                     {
-                        <label class="flex flex-col items-center cursor-pointer group">
-                            <input type="radio" asp-for="Calificacion.Puntaje" value="@i" class="sr-only peer" />
-                            <span class="text-3xl peer-checked:scale-125 group-hover:scale-110 transition-transform select-none">⭐</span>
-                            <span class="text-xs text-slate-400 mt-1">@i</span>
+                        <label>
+                            <input type="radio" asp-for="Calificacion.Puntuacion" value="@i" />
+                            ⭐
                         </label>
                     }
                 </div>
+                <div class="flex justify-between text-xs text-slate-300 mt-2 px-1">
+                    <span>Muy malo</span>
+                    <span>Excelente</span>
+                </div>
             </div>
+
+            @* Comment *@
             <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1">Comentario</label>
+                <label class="field-label">Comentario</label>
                 <textarea asp-for="Calificacion.Comentario" rows="4"
                           placeholder="Describe tu experiencia con este servicio..."
-                          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"></textarea>
+                          class="input resize-none"></textarea>
             </div>
-            <button type="submit"
-                    class="w-full bg-yellow-400 text-yellow-900 py-3 rounded-xl font-bold hover:bg-yellow-300 transition shadow text-lg">
+
+            <button type="submit" class="btn-oro w-full text-base py-3.5 font-display font-black">
                 ⭐ Enviar Calificación
             </button>
             <a href="/Paginas/Solicitudes"
-               class="block text-center text-slate-500 text-sm hover:text-slate-700">Cancelar</a>
+               class="block text-center text-slate-400 text-sm hover:text-slate-600 no-underline">
+                Cancelar
+            </a>
         </form>
     </div>
 </div>

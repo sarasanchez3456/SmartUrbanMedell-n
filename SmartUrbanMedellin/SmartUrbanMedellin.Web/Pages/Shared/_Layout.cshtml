@@ -3,15 +3,31 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"] - SmartUrban Medellín</title>
+    <title>@ViewData["Title"] — SmartUrban Medellín</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
           theme: {
             extend: {
+              fontFamily: {
+                display: ['Syne', 'sans-serif'],
+                body: ['DM Sans', 'sans-serif'],
+              },
               colors: {
-                brand: { DEFAULT:'#1d4ed8', light:'#3b82f6', dark:'#1e3a8a' }
+                verde:  { DEFAULT:'#00C47A', dark:'#009B5F', light:'#E6FFF5' },
+                azul:   { DEFAULT:'#1B3FE4', dark:'#1230B0', light:'#EEF1FD' },
+                oro:    { DEFAULT:'#F5C400', dark:'#C79E00', light:'#FFFBE6' },
+                carbon: { DEFAULT:'#0F1523', mid:'#1E2840', soft:'#2D3A55' },
+              },
+              boxShadow: {
+                glow: '0 0 40px rgba(0,196,122,.18)',
+                card: '0 4px 24px rgba(15,21,35,.08)',
+                hover:'0 8px 40px rgba(15,21,35,.14)',
               }
             }
           }
@@ -21,37 +37,254 @@
     <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.1/maptiler-sdk.css" rel="stylesheet" />
     <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.1/maptiler-sdk.umd.min.js"></script>
 
+    <link rel="stylesheet" href="~/CSS/estilos.css" />
     <style>
-        .mapa-box { width:100%; height:420px; border-radius:0.75rem; overflow:hidden; }
+        * { font-family: 'DM Sans', sans-serif; }
+        h1,h2,h3,.font-display { font-family: 'Syne', sans-serif; }
+
+        body { background: #F4F6FB; }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: #0F1523;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .nav-link {
+            color: rgba(255,255,255,.6);
+            font-size: .85rem;
+            font-weight: 500;
+            letter-spacing: .01em;
+            padding: .4rem .75rem;
+            border-radius: .5rem;
+            transition: color .2s, background .2s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+        .nav-cta {
+            background: #00C47A;
+            color: #0F1523;
+            font-weight: 700;
+            font-size: .82rem;
+            padding: .45rem 1.1rem;
+            border-radius: 999px;
+            transition: background .2s, transform .15s;
+            letter-spacing: .01em;
+        }
+        .nav-cta:hover { background: #00E88F; transform: translateY(-1px); }
+
+        /* ── Cards ── */
+        .card {
+            background: #fff;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(15,21,35,.07);
+            transition: box-shadow .22s, transform .22s;
+        }
+        .card:hover { box-shadow: 0 8px 40px rgba(15,21,35,.13); transform: translateY(-2px); }
+
+        .card-header {
+            background: #0F1523;
+            color: #fff;
+            padding: 1rem 1.5rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: .95rem;
+            letter-spacing: .01em;
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+        .card-header.verde  { background: linear-gradient(90deg, #009B5F, #00C47A); }
+        .card-header.azul   { background: linear-gradient(90deg, #1230B0, #1B3FE4); }
+        .card-header.oro    { background: linear-gradient(90deg, #C79E00, #F5C400); color: #0F1523; }
+        .card-header.grafito{ background: linear-gradient(90deg, #1E2840, #2D3A55); }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            background: #1B3FE4; color: #fff;
+            font-weight: 600; font-size: .875rem;
+            padding: .65rem 1.5rem; border-radius: .75rem;
+            border: none; cursor: pointer;
+            transition: background .2s, transform .15s, box-shadow .2s;
+        }
+        .btn-primary:hover { background: #1230B0; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(27,63,228,.3); }
+
+        .btn-verde {
+            background: #00C47A; color: #0F1523;
+            font-weight: 700; font-size: .875rem;
+            padding: .65rem 1.5rem; border-radius: .75rem;
+            border: none; cursor: pointer;
+            transition: background .2s, transform .15s;
+        }
+        .btn-verde:hover { background: #00E88F; transform: translateY(-1px); }
+
+        .btn-oro {
+            background: #F5C400; color: #0F1523;
+            font-weight: 700; font-size: .875rem;
+            padding: .65rem 1.5rem; border-radius: .75rem;
+            border: none; cursor: pointer;
+            transition: background .2s, transform .15s;
+        }
+        .btn-oro:hover { background: #FFD500; transform: translateY(-1px); }
+
+        .btn-ghost {
+            background: transparent; color: #64748b;
+            font-size: .85rem; font-weight: 500;
+            padding: .5rem 1rem; border-radius: .6rem;
+            border: 1.5px solid #e2e8f0; cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-ghost:hover { border-color: #1B3FE4; color: #1B3FE4; background: #EEF1FD; }
+
+        /* ── Form inputs ── */
+        .input {
+            width: 100%;
+            border: 1.5px solid #E2E8F0;
+            border-radius: .75rem;
+            padding: .65rem 1rem;
+            font-size: .875rem;
+            color: #0F1523;
+            background: #FAFBFF;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none;
+        }
+        .input:focus {
+            border-color: #1B3FE4;
+            box-shadow: 0 0 0 3px rgba(27,63,228,.12);
+            background: #fff;
+        }
+        label.field-label {
+            display: block;
+            font-size: .8rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: .4rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        /* ── Table ── */
+        .data-table { width:100%; border-collapse:collapse; }
+        .data-table thead { background: #F4F6FB; }
+        .data-table thead th {
+            padding: .75rem 1rem;
+            text-align: left;
+            font-size: .72rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+        .data-table tbody tr {
+            border-top: 1px solid #F1F5F9;
+            transition: background .15s;
+        }
+        .data-table tbody tr:hover { background: #FAFBFF; }
+        .data-table td { padding: .9rem 1rem; font-size: .875rem; color: #334155; }
+
+        /* ── Badges ── */
+        .badge {
+            display: inline-flex; align-items: center;
+            padding: .25rem .75rem; border-radius: 999px;
+            font-size: .72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .04em;
+        }
+        .badge-verde   { background: #E6FFF5; color: #009B5F; }
+        .badge-amarillo{ background: #FFFBE6; color: #C79E00; }
+        .badge-rojo    { background: #FFF0F0; color: #C0392B; }
+        .badge-azul    { background: #EEF1FD; color: #1230B0; }
+
+        /* ── Mapa ── */
+        .mapa-box { width:100%; height:420px; }
         .mapa-tall { height:520px; }
+
+        /* ── Page header ── */
+        .page-header {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.75rem;
+        }
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.6rem; font-weight: 800;
+            color: #0F1523;
+        }
+
+        /* ── Coord display ── */
+        .coords-box {
+            background: #F4F6FB;
+            border: 1.5px solid #E2E8F0;
+            border-radius: .75rem;
+            padding: .65rem 1rem;
+            font-family: 'DM Mono', monospace;
+            font-size: .78rem;
+            color: #64748b;
+        }
+
+        /* ── Footer ── */
+        footer {
+            background: #0F1523;
+            border-top: 1px solid rgba(255,255,255,.06);
+            color: rgba(255,255,255,.35);
+            font-size: .8rem;
+            padding: 1.25rem 2rem;
+            text-align: center;
+        }
+
+        /* ── Animations ── */
+        @@keyframes fadeUp {
+            from { opacity:0; transform:translateY(16px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .animate-up { animation: fadeUp .45s ease both; }
+        .delay-1 { animation-delay: .08s; }
+        .delay-2 { animation-delay: .16s; }
+        .delay-3 { animation-delay: .24s; }
+        .delay-4 { animation-delay: .32s; }
+
+        /* ── Star rating ── */
+        .star-group input[type=radio] { display:none; }
+        .star-group label { font-size: 2.2rem; cursor:pointer; transition: transform .15s; filter: grayscale(1); }
+        .star-group label:hover,
+        .star-group input:checked ~ label { filter: none; }
+        .star-group { display:flex; flex-direction:row-reverse; gap:.25rem; justify-content:center; }
+        .star-group label:hover,
+        .star-group label:hover ~ label,
+        .star-group input:checked ~ label { filter:none; transform:scale(1.15); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body>
 
-    <nav class="bg-blue-700 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/" class="font-bold text-xl flex items-center gap-2">
-                📍 SmartUrban Medellín
+    <nav class="navbar sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2.5 group">
+                <div class="w-8 h-8 rounded-lg bg-verde flex items-center justify-center text-carbon font-display font-black text-sm">S</div>
+                <span class="font-display font-bold text-white text-base tracking-tight">SmartUrban <span class="text-verde">Medellín</span></span>
             </a>
-            <div class="hidden md:flex items-center gap-6 text-sm font-medium">
-                <a href="/Paginas/Menu" class="hover:text-yellow-300 transition">Menú</a>
-                <a href="/Paginas/Proveedores" class="hover:text-yellow-300 transition">Proveedores</a>
-                <a href="/Paginas/Servicios" class="hover:text-yellow-300 transition">Servicios</a>
-                <a href="/Paginas/Solicitudes" class="hover:text-yellow-300 transition">Solicitudes</a>
-                <a href="/Paginas/RegistrarProveedor"
-                   class="bg-yellow-400 text-blue-900 px-4 py-1.5 rounded-full font-semibold hover:bg-yellow-300 transition">
-                    + Proveedor
-                </a>
+            <div class="hidden md:flex items-center gap-1">
+                <a href="/Paginas/Menu"      class="nav-link">Menú</a>
+                <a href="/Paginas/Proveedores" class="nav-link">Proveedores</a>
+                <a href="/Paginas/Servicios"   class="nav-link">Servicios</a>
+                <a href="/Paginas/Solicitudes" class="nav-link">Solicitudes</a>
+                <a href="/Paginas/RegistrarProveedor" class="nav-cta ml-3">+ Proveedor</a>
             </div>
+            <!-- Mobile toggle placeholder -->
+            <button class="md:hidden text-white/60 hover:text-white" onclick="document.getElementById('mobile-nav').classList.toggle('hidden')">☰</button>
+        </div>
+        <div id="mobile-nav" class="hidden md:hidden px-5 pb-4 flex flex-col gap-1">
+            <a href="/Paginas/Menu"             class="nav-link">Menú</a>
+            <a href="/Paginas/Proveedores"      class="nav-link">Proveedores</a>
+            <a href="/Paginas/Servicios"        class="nav-link">Servicios</a>
+            <a href="/Paginas/Solicitudes"      class="nav-link">Solicitudes</a>
+            <a href="/Paginas/RegistrarProveedor" class="nav-cta mt-1 text-center">+ Proveedor</a>
         </div>
     </nav>
 
-    <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
+    <main class="max-w-7xl mx-auto w-full px-5 py-8">
         @RenderBody()
     </main>
 
-    <footer class="bg-slate-800 text-slate-400 text-center text-sm py-4 mt-auto">
-        © 2025 SmartUrban Medellín · Conectando ciudadanos con servicios urbanos
+    <footer>
+        © 2025 SmartUrban Medellín · Conectando ciudadanos con servicios urbanos inteligentes
     </footer>
 
     <script>
@@ -70,15 +303,17 @@
           });
         }
 
-        function agregarPin(mapa, lng, lat, titulo, color='#1d4ed8') {
+        function agregarPin(mapa, lng, lat, titulo, color='#1B3FE4') {
           const el = document.createElement('div');
-          el.style.cssText = `width:28px;height:28px;border-radius:50% 50% 50% 0;
-            background:${color};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);
-            transform:rotate(-45deg);cursor:pointer;`;
+          el.style.cssText = `width:26px;height:26px;border-radius:50% 50% 50% 0;
+            background:${color};border:3px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.3);
+            transform:rotate(-45deg);cursor:pointer;transition:transform .2s;`;
+          el.onmouseenter = () => el.style.transform = 'rotate(-45deg) scale(1.2)';
+          el.onmouseleave = () => el.style.transform = 'rotate(-45deg) scale(1)';
           new maptilersdk.Marker({ element: el })
             .setLngLat([lng, lat])
-            .setPopup(new maptilersdk.Popup({ offset:25 }).setHTML(
-              `<div style="font-weight:600;font-size:13px">${titulo}</div>`
+            .setPopup(new maptilersdk.Popup({ offset:25, className:'smart-popup' }).setHTML(
+              `<div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;padding:4px 2px">${titulo}</div>`
             ))
             .addTo(mapa);
         }
@@ -91,11 +326,11 @@
             document.getElementById(idLat).value = lat;
             document.getElementById(idLng).value = lng;
             if (idDisplay)
-              document.getElementById(idDisplay).textContent = `📍 Lat: ${lat}  |  Lng: ${lng}`;
+              document.getElementById(idDisplay).textContent = `📍 Lat: ${lat}  ·  Lng: ${lng}`;
             if (marker) marker.remove();
             const el = document.createElement('div');
-            el.style.cssText = `width:20px;height:20px;border-radius:50%;
-              background:#059669;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);`;
+            el.style.cssText = `width:18px;height:18px;border-radius:50%;
+              background:#00C47A;border:3px solid #fff;box-shadow:0 2px 12px rgba(0,196,122,.5);`;
             marker = new maptilersdk.Marker({ element: el })
               .setLngLat([parseFloat(lng), parseFloat(lat)])
               .addTo(mapa);
@@ -103,7 +338,7 @@
         }
     </script>
 
-    <script src="/JS/scripts.js"></script>
+    <script src="~/JS/scripts.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
