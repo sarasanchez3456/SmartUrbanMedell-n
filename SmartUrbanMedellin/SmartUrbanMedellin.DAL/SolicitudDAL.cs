@@ -1,4 +1,6 @@
-using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using SmartUrbanMedellin.ENT;
 
 namespace SmartUrbanMedellin.DAL

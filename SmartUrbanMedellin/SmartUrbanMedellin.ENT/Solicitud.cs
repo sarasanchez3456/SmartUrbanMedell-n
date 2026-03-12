@@ -1,3 +1,5 @@
+using System;
+
 namespace SmartUrbanMedellin.ENT
 {
     public class Solicitud

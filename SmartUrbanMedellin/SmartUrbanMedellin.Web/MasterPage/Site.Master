@@ -1,1 +1,556 @@
-<%-- MasterPage de referencia - en ASP.NET Core usar Pages/Shared/_Layout.cshtml --%>
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.Master.cs" Inherits="SmartUrbanMedellin.Web.MasterPage.SiteMaster" %>
+
+<!DOCTYPE html>
+<html lang="es">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%: Page.Title %> — SmartUrban Medellín</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Outfit', 'sans-serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        verde: { DEFAULT: '#00C47A', dark: '#009B5F', light: '#E6FFF5' },
+                        azul: { DEFAULT: '#1B3FE4', dark: '#1230B0', light: '#EEF1FD' },
+                        oro: { DEFAULT: '#F5C400', dark: '#C79E00', light: '#FFFBE6' },
+                        carbon: { DEFAULT: '#0F1523', mid: '#1E2840', soft: '#2D3A55' },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.1/maptiler-sdk.css" rel="stylesheet" />
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.1/maptiler-sdk.umd.min.js"></script>
+
+    <link rel="stylesheet" href="~/CSS/estilos.css" />
+    <style>
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3, .font-display { font-family: 'Outfit', sans-serif; }
+        
+        body { background: #F4F6FB; margin: 0; padding: 0; }
+        
+        /* Navbar */
+        .navbar {
+            background: #0F1523;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .navbar-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            text-decoration: none;
+        }
+        .nav-logo-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.5rem;
+            background: #00C47A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0F1523;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 0.875rem;
+        }
+        .nav-logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: white;
+            font-size: 1rem;
+            letter-spacing: -0.025em;
+        }
+        .nav-logo-text span { color: #00C47A; }
+        
+        .nav-links {
+            display: none;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        @media (min-width: 768px) {
+            .nav-links { display: flex; }
+        }
+        .nav-link {
+            color: rgba(255,255,255,.6);
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            transition: color 0.2s, background 0.2s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+        .nav-cta {
+            background: #00C47A;
+            color: #0F1523;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.45rem 1.1rem;
+            border-radius: 999px;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.15s;
+            margin-left: 0.75rem;
+        }
+        .nav-cta:hover { background: #00E88F; transform: translateY(-1px); }
+        
+        .mobile-toggle {
+            display: block;
+            color: rgba(255,255,255,0.6);
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        @media (min-width: 768px) {
+            .mobile-toggle { display: none; }
+        }
+        
+        .mobile-nav {
+            display: none;
+            padding: 0 1.25rem 1rem;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .mobile-nav.show { display: flex; }
+        
+        /* Main content */
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 2rem 1.25rem;
+        }
+        
+        /* Cards */
+        .card {
+            background: #fff;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(15,21,35,.07);
+            transition: box-shadow 0.22s, transform 0.22s;
+            overflow: hidden;
+        }
+        .card:hover { box-shadow: 0 8px 40px rgba(15,21,35,.13); transform: translateY(-2px); }
+        
+        .card-header {
+            background: #0F1523;
+            color: #fff;
+            padding: 1rem 1.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+        .card-header.verde { background: linear-gradient(90deg, #009B5F, #00C47A); }
+        .card-header.azul { background: linear-gradient(90deg, #1230B0, #1B3FE4); }
+        .card-header.oro { background: linear-gradient(90deg, #C79E00, #F5C400); color: #0F1523; }
+        .card-header.grafito { background: linear-gradient(90deg, #1E2840, #2D3A55); }
+        
+        .card-body { padding: 1.5rem; }
+        
+        /* Buttons */
+        .btn-primary {
+            background: #1B3FE4; color: #fff;
+            font-weight: 600; font-size: 0.875rem;
+            padding: 0.65rem 1.5rem; border-radius: 0.75rem;
+            border: none; cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+        .btn-primary:hover { background: #1230B0; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(27,63,228,.3); }
+        
+        .btn-verde {
+            background: #00C47A; color: #0F1523;
+            font-weight: 700; font-size: 0.875rem;
+            padding: 0.65rem 1.5rem; border-radius: 0.75rem;
+            border: none; cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-verde:hover { background: #00E88F; transform: translateY(-1px); }
+        
+        .btn-oro {
+            background: #F5C400; color: #0F1523;
+            font-weight: 700; font-size: 0.875rem;
+            padding: 0.65rem 1.5rem; border-radius: 0.75rem;
+            border: none; cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-oro:hover { background: #FFD500; transform: translateY(-1px); }
+        
+        .btn-ghost {
+            background: transparent; color: #64748b;
+            font-size: 0.85rem; font-weight: 500;
+            padding: 0.5rem 1rem; border-radius: 0.6rem;
+            border: 1.5px solid #e2e8f0; cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .btn-ghost:hover { border-color: #1B3FE4; color: #1B3FE4; background: #EEF1FD; }
+        
+        /* Form inputs */
+        .input {
+            width: 100%;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 0.75rem;
+            padding: 0.65rem 1rem;
+            font-size: 0.875rem;
+            color: #0F1523;
+            background: #FAFBFF;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .input:focus {
+            border-color: #1B3FE4;
+            box-shadow: 0 0 0 3px rgba(27,63,228,.12);
+            background: #fff;
+        }
+        label.field-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        
+        /* Table */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table thead { background: #F4F6FB; }
+        .data-table thead th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .data-table tbody tr {
+            border-top: 1px solid #F1F5F9;
+            transition: background 0.15s;
+        }
+        .data-table tbody tr:hover { background: #FAFBFF; }
+        .data-table td { padding: 0.9rem 1rem; font-size: 0.875rem; color: #334155; }
+        
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .badge-verde { background: #E6FFF5; color: #009B5F; }
+        .badge-amarillo { background: #FFFBE6; color: #C79E00; }
+        .badge-rojo { background: #FFF0F0; color: #C0392B; }
+        .badge-azul { background: #EEF1FD; color: #1230B0; }
+        
+        /* Mapa */
+        .mapa-box { width: 100%; height: 420px; }
+        .mapa-tall { height: 520px; }
+        
+        /* Page header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.75rem;
+        }
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #0F1523;
+        }
+        
+        /* Footer */
+        footer {
+            background: #0F1523;
+            border-top: 1px solid rgba(255,255,255,.06);
+            color: rgba(255,255,255,.35);
+            font-size: 0.8rem;
+            padding: 1.25rem 2rem;
+            text-align: center;
+        }
+        
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeUp 0.45s ease both; }
+        
+        /* Star rating */
+        .star-group input[type=radio] { display: none; }
+        .star-group label { 
+            font-size: 2.2rem; 
+            cursor: pointer; 
+            transition: transform 0.15s; 
+            filter: grayscale(1); 
+            color: #F5C400;
+        }
+        .star-group label:hover,
+        .star-group input:checked ~ label { filter: none; }
+        .star-group { display: flex; flex-direction: row-reverse; gap: 0.25rem; justify-content: center; }
+        
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #0F1523 0%, #1E2840 60%, #1230B0 100%);
+            min-height: 280px;
+        }
+        .hero-content {
+            position: relative;
+            padding: 2.5rem 2rem;
+            max-width: 42rem;
+        }
+        @media (min-width: 768px) {
+            .hero-content { padding: 3.5rem 2rem; }
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #00C47A;
+            margin-bottom: 1rem;
+        }
+        .badge-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: #00C47A;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.875rem;
+            font-weight: 900;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+        }
+        @media (min-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+        }
+        .hero-title .text-verde { color: #00C47A; }
+        .hero-subtitle {
+            color: rgba(255,255,255,0.6);
+            font-size: 1rem;
+            max-width: 32rem;
+            margin-bottom: 1.75rem;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.65rem 1.5rem;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        @media (min-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 4px 24px rgba(15,21,35,.07);
+            transition: box-shadow 0.22s, transform 0.22s;
+        }
+        .stat-card:hover { box-shadow: 0 8px 40px rgba(15,21,35,.13); transform: translateY(-2px); }
+        .stat-emoji { font-size: 1.875rem; margin-bottom: 0.5rem; }
+        .stat-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #1B3FE4;
+        }
+        .stat-label {
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+        
+        /* Grid utilities */
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .form-row .form-group { flex: 1; min-width: 200px; }
+    </style>
+    
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="/" class="nav-logo">
+                    <div class="nav-logo-icon">S</div>
+                    <span class="nav-logo-text">SmartUrban <span>Medellín</span></span>
+                </a>
+                <div class="nav-links">
+                    <a href="/Paginas/Menu" class="nav-link">Menú</a>
+                    <a href="/Paginas/Proveedores" class="nav-link">Proveedores</a>
+                    <a href="/Paginas/Servicios" class="nav-link">Servicios</a>
+                    <a href="/Paginas/Solicitudes" class="nav-link">Solicitudes</a>
+                    <a href="/Paginas/RegistrarProveedor" class="nav-cta">+ Proveedor</a>
+                </div>
+                <button type="button" class="mobile-toggle" onclick="document.getElementById('mobile-nav').classList.toggle('show')">☰</button>
+            </div>
+            <div id="mobile-nav" class="mobile-nav">
+                <a href="/Paginas/Menu" class="nav-link">Menú</a>
+                <a href="/Paginas/Proveedores" class="nav-link">Proveedores</a>
+                <a href="/Paginas/Servicios" class="nav-link">Servicios</a>
+                <a href="/Paginas/Solicitudes" class="nav-link">Solicitudes</a>
+                <a href="/Paginas/RegistrarProveedor" class="nav-cta" style="margin-left: 0; margin-top: 0.25rem; text-align: center;">+ Proveedor</a>
+            </div>
+        </nav>
+
+        <main>
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+        </main>
+
+        <footer>
+            © 2025 SmartUrban Medellín · Conectando ciudadanos con servicios urbanos inteligentes
+        </footer>
+
+        <script>
+            var MAPTILER_KEY = 'ZbBJ9WDp7YPDmMKxooBj';
+            if (typeof maptilersdk !== 'undefined') {
+                maptilersdk.config.apiKey = MAPTILER_KEY;
+            }
+
+            function crearMapa(id, lat, lng, zoom) {
+                if (typeof maptilersdk === 'undefined') return null;
+                if (lat === undefined) lat = 6.2442;
+                if (lng === undefined) lng = -75.5812;
+                if (zoom === undefined) zoom = 12;
+                
+                return new maptilersdk.Map({
+                    container: id,
+                    style: maptilersdk.MapStyle.STREETS,
+                    center: [lng, lat],
+                    zoom: zoom
+                });
+            }
+
+            function agregarPin(mapa, lng, lat, titulo, color) {
+                if (color === undefined) color = '#1B3FE4';
+                var el = document.createElement('div');
+                el.style.cssText = 'width:26px;height:26px;border-radius:50% 50% 50% 0;' +
+                    'background:' + color + ';border:3px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.3);' +
+                    'transform:rotate(-45deg);cursor:pointer;transition:transform .2s;';
+                el.onmouseenter = function() { el.style.transform = 'rotate(-45deg) scale(1.2)'; };
+                el.onmouseleave = function() { el.style.transform = 'rotate(-45deg) scale(1)'; };
+                
+                new maptilersdk.Marker({ element: el })
+                    .setLngLat([lng, lat])
+                    .setPopup(new maptilersdk.Popup({ offset: 25, className: 'smart-popup' }).setHTML(
+                        '<div style="font-family:Outfit,sans-serif;font-weight:700;font-size:13px;padding:4px 2px">' + titulo + '</div>'
+                    ))
+                    .addTo(mapa);
+            }
+
+            function activarSeleccion(mapa, idLat, idLng, idDisplay) {
+                var marker = null;
+                mapa.on('click', function(e) {
+                    var lat = e.lngLat.lat.toFixed(6);
+                    var lng = e.lngLat.lng.toFixed(6);
+                    document.getElementById(idLat).value = lat;
+                    document.getElementById(idLng).value = lng;
+                    if (idDisplay)
+                        document.getElementById(idDisplay).innerHTML = '📍 Lat: ' + lat + '  ·  Lng: ' + lng;
+                    if (marker) marker.remove();
+                    var el = document.createElement('div');
+                    el.style.cssText = 'width:18px;height:18px;border-radius:50%;' +
+                        'background:#00C47A;border:3px solid #fff;box-shadow:0 2px 12px rgba(0,196,122,.5);';
+                    marker = new maptilersdk.Marker({ element: el })
+                        .setLngLat([parseFloat(lng), parseFloat(lat)])
+                        .addTo(mapa);
+                });
+            }
+        </script>
+    </form>
+    
+    <script src="~/JS/scripts.js"></script>
+    <asp:ContentPlaceHolder ID="Scripts" runat="server">
+    </asp:ContentPlaceHolder>
+</body>
+</html>

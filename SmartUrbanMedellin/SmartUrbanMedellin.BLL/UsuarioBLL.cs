@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using SmartUrbanMedellin.DAL;
 using SmartUrbanMedellin.ENT;
 
